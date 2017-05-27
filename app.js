@@ -7,6 +7,7 @@ $(document).ready(function(){
 var board = null;
 var canvas = null;
 var ctx = null;
+var knight = null;
 
 var App = function(){
 
@@ -36,6 +37,23 @@ var App = function(){
         };
     };
     
+    this.drawKnight = function(x, y){
+        if(knight === null){
+            knight = new Image();
+            knight.src = 'images/knight.png';
+            knight.onload = function(){
+                this.drawKnightSrc(x, y);
+            };
+        } else {
+            this.drawKnightSrc(x, y);
+        }
+    };
+    
+    this.drawKnightSrc = function(x, y){
+        cell = this.getCellPosition(x, y);
+        ctx.drawImage(knight, cell.x + 10, cell.y + 10, cell.w - 20, cell.h - 20);
+    };
+    
     this.drawBoard  =  function(){
         ctx.strokeStyle = '#000';
         ctx.fillStyle = '#c00';
@@ -46,11 +64,12 @@ var App = function(){
                 ctx.strokeRect(cell.x, cell.y, cell.w, cell.h);
                 if(Math.floor(Math.random()*2) == 1){
                     ctx.fillRect(cell.x + 5, cell.y + 5, cell.w - 10, cell.h - 10);
+                } else if(Math.floor(Math.random()*2) == 1){
+                    this.drawKnight(j, i);
                 }
             }
         }
         
     };
 };
-
 
