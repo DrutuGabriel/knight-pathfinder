@@ -1,7 +1,7 @@
 $(document).ready(function(){
     board = new App();
     board.init();
-    var coordList = [[2, 3],[4, 4], [5, 6]];
+    var coordList = [[2, 3],[4, 4], [5, 2]];
     board.moveKnightTo(coordList);
 });
 
@@ -111,7 +111,8 @@ var App = function(){
             speedY = - speedY;
         }
         
-        var moveId = setInterval(function(){
+        var  moveAct = function(){
+         
             if(knightPos.x != targetPos.x){
                 knightPos.x += speedX;
             }
@@ -119,7 +120,7 @@ var App = function(){
                 knightPos.y += speedY;
             }
             else {
-                clearInterval(moveId);
+                cancelAnimationFrame(moveId);
                 setTimeout(function(){
                     self.moveKnightTo(moveList);
                 }, 250);
@@ -129,7 +130,11 @@ var App = function(){
             self.drawBoard();
             self.drawKnight(knightPos.x, knightPos.y);
             self.updateKnightPos(knightPos.x, knightPos.y);
-        }, 15);
+            
+            requestAnimationFrame(moveAct);
+        };
+        
+        var moveId = requestAnimationFrame(moveAct);
     };
         
     this.drawBoard  =  function(){
