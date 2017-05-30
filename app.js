@@ -1,8 +1,11 @@
+$(document).mousemove(function(e) {
+    window.mousePosX= e.pageX;
+    window.mousePosY = e.pageY;
+});
+
 $(document).ready(function(){
     board = new App();
     board.init();
-    var coordList = [[2, 3],[4, 4], [5, 2]];
-    board.moveKnightTo(coordList);
 });
 
 var board = null;
@@ -19,8 +22,13 @@ var App = function(){
     this.knightPos = {
         c_x: 1,
         c_y: 1,
+        x: 0,
+        y: 0,
     };
-        
+    
+    this.boardState = 0;
+    this.knightIsMobile = 1;
+    this.moveList = [[2, 3],[1, 5], [2, 7]];
     
     this.init = function(){
         var self = this;
@@ -37,23 +45,44 @@ var App = function(){
         
         this.loadKnightSprite();
         this.knight.onload = function(){
-            self.drawBoard();
-            self.drawKnightToCell(self.knightPos.c_x, self.knightPos.c_y);
+            self.main();
         };
     };
+    
+    this.hoverOverCell = function(){
+        var mousePos = getMousePos(canvas);            
+        var pos = self.getCellCoords(mousePos.x, mousePos.y);
+        if(self.boardState === 0){
+            self.fillCell(pos.c_x, pos.c_y);
+        }
+    };
+    
+    this.fillCell = function(c_x, c_y){
+        var pos = this.getCellPosition(c_x, c_y);
+        ctx.fillStyle = 'rgba(125, 125, 125, 0.5)';
+        ctx.fillRect(pos.x+1, pos.y+1, this.c_w-2, this.c_h-2);
+    };
+    
     
     this.updateKnightPos = function(x, y, cells) {
         if(typeof cells == 'undefined'){
             cells = false;
         }
         
+        var pos;
         if(cells){
+            pos = this.getCellPosition(x, y);
             this.knightPos.c_x = x;
             this.knightPos.c_y = y;
+            this.knightPos.x = pos.x;
+            this.knightPos.y = pos.y;
+
         } else {
-            var pos = this.getCellCoords(x, y);
+            pos = this.getCellCoords(x, y);
             this.knightPos.c_x = pos.c_x;
             this.knightPos.c_y = pos.c_y;
+            this.knightPos.x = x;
+            this.knightPos.y = y;
         }
     };
     
@@ -86,23 +115,26 @@ var App = function(){
         ctx.drawImage(this.knight, x + 10, y + 10, this.c_w - 20, this.c_h - 20);
     };
     
-    this.moveKnightTo = function(moveList){
-        var move;
-        if(moveList.length > 0){
-            move = moveList.shift();
-        } else {
+    this.moveKnightTo = function(){
+        var self = this;
+        if(this.moveList.length === 0){
             return;
         }
+        
+        var move = this.moveList[0];
         
         var c_x = move[0];
         var c_y = move[1];
         
-        var self = this;
-        var knightPos = this.getCellPosition(this.knightPos.c_x, this.knightPos.c_y);
+        var knightPos = {
+            x: this.knightPos.x,
+            y: this.knightPos.y,
+        };
+        
         var targetPos = this.getCellPosition(c_x, c_y);
         
-        var speedX = 1;
-        var speedY = 1;
+        var speedX = 2;
+        var speedY = 2;
         
         if(knightPos.x > targetPos.x){
             speedX = - speedX;
@@ -111,32 +143,29 @@ var App = function(){
             speedY = - speedY;
         }
         
-        var  moveAct = function(){
-         
-            if(knightPos.x != targetPos.x){
-                knightPos.x += speedX;
-            }
-            else if ( knightPos.y != targetPos.y){
-                knightPos.y += speedY;
-            }
-            else {
-                cancelAnimationFrame(moveId);
-                setTimeout(function(){
-                    self.moveKnightTo(moveList);
-                }, 250);
-                return;
-            }
+ 
+        if(knightPos.x != targetPos.x){
+            knightPos.x += speedX;
+        }
+        else if ( knightPos.y != targetPos.y){
+            knightPos.y += speedY;
+        }
+        else {
+            this.knightIsMobile = 0;
+            self.moveList.shift();
+            setTimeout(function(){
+                self.knightIsMobile = 1;
+            }, 250);
             
-            self.drawBoard();
-            self.drawKnight(knightPos.x, knightPos.y);
-            self.updateKnightPos(knightPos.x, knightPos.y);
-            
-            requestAnimationFrame(moveAct);
-        };
+        }
         
-        var moveId = requestAnimationFrame(moveAct);
+        self.updateKnightPos(knightPos.x, knightPos.y);
     };
-        
+
+    this.drawKnightBase = function(){
+        this.drawKnight(this.knightPos.x, this.knightPos.y);
+    };
+       
     this.drawBoard  =  function(){
         canvas.width = canvas.width;
         ctx.strokeStyle = '#000';
@@ -150,8 +179,33 @@ var App = function(){
         }
     };
     
+    this.drawAll = function(){
+        this.drawBoard();
+        this.drawKnightBase();
+    };
+    
     this.main = function(){
+        self = this;
+        var mainId = function(){
+            self.drawBoard();
+            self.hoverOverCell();
+            if(self.knightIsMobile === 1){
+                self.moveKnightTo();
+            }
+            self.drawKnightBase();
+            requestAnimationFrame(mainId);
+        };
         
+        requestAnimationFrame(mainId);
     };
 };
+
+function getMousePos(canvas) {
+    var rect = canvas.getBoundingClientRect();
+    
+    return {
+      x: window.mousePosX - rect.left,
+      y: window.mousePosY - rect.top
+    };
+}
 
