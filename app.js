@@ -28,7 +28,7 @@ var App = function(){
     
     this.boardState = 0;
     this.knightIsMobile = 1;
-    this.moveList = [[2, 3],[1, 5], [2, 7]];
+    this.moveList = [[2, 3],[4, 2]];
     
     this.init = function(){
         var self = this;
@@ -54,8 +54,10 @@ var App = function(){
     };
     
     this.hoverOverCell = function(){
-        var mousePos = getMousePos(canvas);            
+        var mousePos = getMousePos(canvas);
+       
         var pos = self.getCellCoords(mousePos.x, mousePos.y);
+        
         if(self.boardState === 0){
             self.fillCell(pos.c_x, pos.c_y);
         }
@@ -63,6 +65,7 @@ var App = function(){
     
     this.fillCell = function(c_x, c_y){
         var pos = this.getCellPosition(c_x, c_y);
+      
         ctx.fillStyle = 'rgba(125, 125, 125, 0.5)';
         ctx.fillRect(pos.x+1, pos.y+1, this.c_w-2, this.c_h-2);
     };
@@ -100,8 +103,8 @@ var App = function(){
     
     this.getCellCoords = function(x, y){
         return {
-              c_x: Math.floor((x + this.c_w )/ this.c_w),
-              c_y: Math.floor((y + this.c_h )/ this.c_h),
+              c_x: Math.floor((x + this.c_w)/ this.c_w),
+              c_y: Math.floor((y + this.c_h)/ this.c_h),
         };
     };
     
@@ -208,8 +211,8 @@ function getMousePos(canvas) {
     var rect = canvas.getBoundingClientRect();
     
     return {
-      x: window.mousePosX - rect.left,
-      y: window.mousePosY - rect.top
+      x: window.mousePosX - rect.left - 1,
+      y: window.mousePosY - rect.top - 1,
     };
 }
 
