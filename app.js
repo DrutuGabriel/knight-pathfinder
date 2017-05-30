@@ -46,6 +46,10 @@ var App = function(){
         this.loadKnightSprite();
         this.knight.onload = function(){
             self.main();
+            $(canvas).on('click', function(){
+                var pos = self.getCellCoords(window.mousePosX, window.mousePosY);
+                self.moveList.push([pos.c_x, pos.c_y]);
+            });
         };
     };
     
