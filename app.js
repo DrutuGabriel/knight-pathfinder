@@ -13,11 +13,12 @@ var canvas = null;
 var ctx = null;
 
 var App = function(){
-
     this.c_w = 50;
     this.c_h = 50;
     this.cells_x = 8;
     this.cells_y = 8;
+    this.width = this.c_w * this.cells_x;
+    this.height = this.c_h * this.cells_y;
     this.knight = null;
     this.knightPos = {
         c_x: 1,
@@ -36,8 +37,8 @@ var App = function(){
         canvas = document.getElementById('canvas-board');
         ctx = canvas.getContext('2d');
     
-        canvas.width = this.c_w *  this.cells_x;
-        canvas.height = this.c_h * this.cells_y;
+        canvas.width = this.width;
+        canvas.height = this.height;
         $(canvas).css({
             width: canvas.width,
             height: canvas.height,
@@ -48,7 +49,7 @@ var App = function(){
             self.main();
             $(canvas).on('click', function(){
                 var mousePos = getMousePos(canvas);
-                if(mousePos.x > 0 && mousePos.x < 400 && mousePos.y > 0 && mousePos.y < 400){
+                if(mousePos.x > 0 && mousePos.x < self.width && mousePos.y > 0 && mousePos.y < self.height){
                     var pos = self.getCellCoords(mousePos.x, mousePos.y);
                     self.moveList.push([pos.c_x, pos.c_y]);
                 }
