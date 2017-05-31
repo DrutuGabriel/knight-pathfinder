@@ -47,8 +47,11 @@ var App = function(){
         this.knight.onload = function(){
             self.main();
             $(canvas).on('click', function(){
-                var pos = self.getCellCoords(window.mousePosX, window.mousePosY);
-                self.moveList.push([pos.c_x, pos.c_y]);
+                var mousePos = getMousePos(canvas);
+                if(mousePos.x > 0 && mousePos.x < 400 && mousePos.y > 0 && mousePos.y < 400){
+                    var pos = self.getCellCoords(mousePos.x, mousePos.y);
+                    self.moveList.push([pos.c_x, pos.c_y]);
+                }
             });
         };
     };
@@ -211,8 +214,8 @@ function getMousePos(canvas) {
     var rect = canvas.getBoundingClientRect();
     
     return {
-      x: window.mousePosX - rect.left - 1,
-      y: window.mousePosY - rect.top - 1,
+      x: window.mousePosX - rect.left,
+      y: window.mousePosY - rect.top,
     };
 }
 
