@@ -30,6 +30,7 @@ var App = function(){
     this.boardState = 0;
     this.knightIsMobile = 1;
     this.moveList = [[2, 3],[4, 2]];
+    this.obstacles = {'1':1, '3':1, '5':1, '8':1};
     
     this.init = function(){
         var self = this;
@@ -112,6 +113,20 @@ var App = function(){
         };
     };
     
+    this.getCellsByIdx = function(idx)
+    {
+        idx = parseInt(idx);
+        
+        return {
+            c_x: (idx + 1) % this.cells_y ,
+            c_y: Math.floor(idx / this.cells_y) + 1,
+        };
+    };
+    
+    this.getIdxByCells = function(c_x, c_y){
+        // return idx  
+    };
+    
     this.loadKnightSprite = function(){
         this.knight = new Image();
         this.knight.src = 'images/knight.png';
@@ -176,12 +191,44 @@ var App = function(){
     this.drawKnightBase = function(){
         this.drawKnight(this.knightPos.x, this.knightPos.y);
     };
-       
+    
+
+    this.drawObstacle = function(x, y){
+        ctx.fillStyle = 'rgba(175, 65, 65, 1)';
+        ctx.fillRect(x+2, y+2, this.c_w-4, this.c_h-4);
+        
+        ctx.beginPath();
+        ctx.strokeStyle = '#fff';
+        ctx.moveTo(x + 2, y + 2);
+        ctx.lineTo(x + this.c_w-4, y + this.c_h-4);
+        ctx.stroke();
+    };
+    
+    this.drawObstacles = function()
+    {
+        var obstacles = Object.keys(this.obstacles);
+        var obstaclesLen = obstacles.length;
+    
+        for(var i = 0; i < obstaclesLen; i++){
+            
+            var cells = this.getCellsByIdx(obstacles[i]);
+            
+            var pos = this.getCellPosition(cells.c_x, cells.c_y);
+            this.drawObstacle(pos.x, pos.y);
+        }
+    };
+    
+    this.removeObstacle = function(c_x, c_y){
+        // get idx from c_x, c_y
+        // delete the obstacle entry
+    };
+    
     this.drawBoard  =  function(){
         canvas.width = canvas.width;
         ctx.strokeStyle = '#000';
 
         var pos = null;
+
         for(var i = 1; i <= this.cells_y; i++){
             for(var j = 1; j <= this.cells_x; j++){
                 pos = this.getCellPosition(j, i);
@@ -199,7 +246,9 @@ var App = function(){
         self = this;
         var mainId = function(){
             self.drawBoard();
+            
             self.hoverOverCell();
+            self.drawObstacles();
             if(self.knightIsMobile === 1){
                 self.moveKnightTo();
             }
