@@ -76,14 +76,25 @@ var App = function(){
             self.fillCell(pos.c_x, pos.c_y);
             
             var idx = self.getIdxByCells(pos.c_x, pos.c_y);
-            // Get idx of c_x and c_y
+         
             if(self.obstacles[idx] === 1){
                 self.drawCellX(pos.c_x, pos.c_y);
-                $(canvas).css('cursor', 'pointer');
                 self.currentAction = self.removeObstacle;
-            } 
-            // if cell is obstacle - add an x in the middle
-            // else write move in the middle and and x at the right top
+            } else {
+                var cellPos = this.getCellPosition(pos.c_x, pos.c_y);
+                var imageSizeRatio = 0.25;
+                var imageW = self.c_w * imageSizeRatio;
+                var imageH = self.c_h * imageSizeRatio;
+                var imagePosX = cellPos.x + (self.c_w - imageW) - 5;
+                var imagePosY = cellPos.y + 5;
+                
+                if(mousePos.x >= imagePosX && mousePos.y <= (imagePosY + imageH)){
+                    self.drawTopRightCornerX(pos.c_x, pos.c_y, imageSizeRatio + 0.10);
+                    self.currentAction = self.addObstacle;
+                } else {
+                    self.drawTopRightCornerX(pos.c_x, pos.c_y, imageSizeRatio); 
+                }
+            }
         }
     };
     
@@ -95,16 +106,29 @@ var App = function(){
     };
     
     this.drawCellX = function(c_x, c_y){
-        var pos = this.getCellPosition(c_x, c_y);
         var blackX = this.images.blackX;
+        var pos = this.getCellPosition(c_x, c_y);
         var imageW = this.c_w / 2;
         var imageH = this.c_h / 2;
-        var centerX = pos.x + ((this.c_w - imageW) / 2);
-        var centerY = pos.y + ((this.c_h - imageH) / 2);        
+        var imagePosX = pos.x + ((this.c_w - imageW) / 2);
+        var imagePosY = pos.y + ((this.c_h - imageH) / 2);        
         
-        ctx.drawImage(blackX, centerX, centerY, imageW, imageH);
+        ctx.drawImage(blackX, imagePosX, imagePosY, imageW, imageH);
     };
     
+    this.drawTopRightCornerX = function(c_x, c_y, size){
+        if(typeof size == 'undefined'){
+            size = 0.25;
+        }
+        var pos = this.getCellPosition(c_x, c_y);
+        var blackX = this.images.blackX;
+        var imageW = this.c_w * size;
+        var imageH = this.c_h * size;
+        var imagePosX = pos.x + (this.c_w - imageW) - 5;
+        var imagePosY = pos.y + 5;
+        
+        ctx.drawImage(blackX, imagePosX, imagePosY, imageW, imageH);
+    };
     
     this.updateKnightPos = function(x, y, cells) {
         if(typeof cells == 'undefined'){
@@ -303,7 +327,7 @@ var App = function(){
             self.drawBoard();
             self.drawObstacles();
             self.currentAction = self.addMoveToList;
-            $(canvas).css('cursor', 'auto');
+
             self.hoverOverCell();
             
             if(self.knightIsMobile === 1){
