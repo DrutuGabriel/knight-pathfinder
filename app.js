@@ -34,7 +34,7 @@ var App = function(){
     this.knightIsMobile = 1;
     this.moveList = [[2, 3],[4, 2]];
     this.obstacles = {'1':1, '3':1, '5':1, '8':1};
-    this.action = null;
+    this.currentAction = this.addMoveToList;
     
     this.init = function(){
         var self = this;
@@ -57,10 +57,14 @@ var App = function(){
                 var mousePos = getMousePos(canvas);
                 if(mousePos.x > 0 && mousePos.x < self.width && mousePos.y > 0 && mousePos.y < self.height){
                     var pos = self.getCellCoords(mousePos.x, mousePos.y);
-                    self.moveList.push([pos.c_x, pos.c_y]);
+                    self.currentAction(pos.c_x, pos.c_y);
                 }
             });
         };
+    };
+    
+    this.addMoveToList = function (c_x, c_y) {
+        this.moveList.push([c_x, c_y]);
     };
     
     this.hoverOverCell = function(){
@@ -76,6 +80,7 @@ var App = function(){
             if(self.obstacles[idx] === 1){
                 self.drawCellX(pos.c_x, pos.c_y);
                 $(canvas).css('cursor', 'pointer');
+                self.currentAction = self.removeObstacle;
             } 
             // if cell is obstacle - add an x in the middle
             // else write move in the middle and and x at the right top
@@ -297,6 +302,7 @@ var App = function(){
         var mainId = function(){
             self.drawBoard();
             self.drawObstacles();
+            self.currentAction = self.addMoveToList;
             $(canvas).css('cursor', 'auto');
             self.hoverOverCell();
             
