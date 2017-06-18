@@ -171,9 +171,12 @@ var App = function(){
     {
         idx = parseInt(idx);
         
+        var c_y = Math.floor(idx / this.cells_x) + 1;
+        var c_x = (idx - ((c_y -1) * this.cells_x)) + 1;
+        
         return {
-            c_x: (idx + 1) % this.cells_y ,
-            c_y: Math.floor(idx / this.cells_y) + 1,
+            c_x: c_x,
+            c_y: c_y,
         };
     };
     
@@ -272,6 +275,7 @@ var App = function(){
         for(var i = 0; i < obstaclesLen; i++){
             
             var cells = this.getCellsByIdx(obstacles[i]);
+            //console.log(cells);
             
             var pos = this.getCellPosition(cells.c_x, cells.c_y);
             this.drawObstacle(pos.x, pos.y);
