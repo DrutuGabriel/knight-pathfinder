@@ -20,6 +20,9 @@ var App = function(){
     this.width = this.c_w * this.cells_x;
     this.height = this.c_h * this.cells_y;
     this.knight = null;
+    this.images = {
+        blackX : null,    
+    };
     this.knightPos = {
         c_x: 1,
         c_y: 1,
@@ -31,6 +34,7 @@ var App = function(){
     this.knightIsMobile = 1;
     this.moveList = [[2, 3],[4, 2]];
     this.obstacles = {'1':1, '3':1, '5':1, '8':1};
+    this.action = null;
     
     this.init = function(){
         var self = this;
@@ -46,6 +50,7 @@ var App = function(){
         });
         
         this.loadKnightSprite();
+        this.loadImages();
         this.knight.onload = function(){
             self.main();
             $(canvas).on('click', function(){
@@ -65,6 +70,15 @@ var App = function(){
         
         if(self.boardState === 0){
             self.fillCell(pos.c_x, pos.c_y);
+            
+            var idx = self.getIdxByCells(pos.c_x, pos.c_y);
+            // Get idx of c_x and c_y
+            if(self.obstacles[idx] === 1){
+                self.drawCellX(pos.c_x, pos.c_y);
+                $(canvas).css('cursor', 'pointer');
+            } 
+            // if cell is obstacle - add an x in the middle
+            // else write move in the middle and and x at the right top
         }
     };
     
@@ -73,6 +87,17 @@ var App = function(){
       
         ctx.fillStyle = 'rgba(125, 125, 125, 0.5)';
         ctx.fillRect(pos.x+1, pos.y+1, this.c_w-2, this.c_h-2);
+    };
+    
+    this.drawCellX = function(c_x, c_y){
+        var pos = this.getCellPosition(c_x, c_y);
+        var blackX = this.images.blackX;
+        var imageW = this.c_w / 2;
+        var imageH = this.c_h / 2;
+        var centerX = pos.x + ((this.c_w - imageW) / 2);
+        var centerY = pos.y + ((this.c_h - imageH) / 2);        
+        
+        ctx.drawImage(blackX, centerX, centerY, imageW, imageH);
     };
     
     
@@ -123,13 +148,20 @@ var App = function(){
         };
     };
     
-    this.getIdxByCells = function(c_x, c_y){
-        // return idx  
+    this.getIdxByCells = function(c_x, c_y){       
+        var idx = (c_y - 1) * this.cells_x + (c_x - 1);
+        
+         return idx;
     };
     
     this.loadKnightSprite = function(){
         this.knight = new Image();
         this.knight.src = 'images/knight.png';
+    };
+    
+    this.loadImages = function(){
+        this.images.blackX = new Image();
+        this.images.blackX.src =  'images/x-black.png';
     };
     
     this.drawKnightToCell = function(c_x, c_y){
@@ -204,8 +236,7 @@ var App = function(){
         ctx.stroke();
     };
     
-    this.drawObstacles = function()
-    {
+    this.drawObstacles = function(){
         var obstacles = Object.keys(this.obstacles);
         var obstaclesLen = obstacles.length;
     
@@ -218,10 +249,29 @@ var App = function(){
         }
     };
     
-    this.removeObstacle = function(c_x, c_y){
-        // get idx from c_x, c_y
-        // delete the obstacle entry
+    /**
+     * Add an obstacle
+     *
+     */
+    this.addObstacle = function(c_x, c_y){
+        var idx = this.getIdxByCells(c_x, c_y);
+        this.obstacles[idx] = 1;
     };
+    
+    /**
+     * Delete the obstacle entry
+     *
+     */
+    this.removeObstacle = function(c_x, c_y){
+        var idx = this.getIdxByCells(c_x, c_y);
+        
+        delete this.obstacles[idx];
+        
+    };
+    
+    // Hover on obstacle function
+    // Cum gandesti coordonatele ca sa recunoasca hoverul pe text 'Remove Obstacle'
+    // Si apoi sa elimine obstacolul de la idx/pozitia respectiva
     
     this.drawBoard  =  function(){
         canvas.width = canvas.width;
@@ -246,9 +296,10 @@ var App = function(){
         self = this;
         var mainId = function(){
             self.drawBoard();
-            
-            self.hoverOverCell();
             self.drawObstacles();
+            $(canvas).css('cursor', 'auto');
+            self.hoverOverCell();
+            
             if(self.knightIsMobile === 1){
                 self.moveKnightTo();
             }
