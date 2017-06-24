@@ -8,7 +8,7 @@ $(document).ready(function(){
     board.init();
 });
 
-var relativeBaseUrl = '';
+var relativeBaseUrl = '/knight-path-finder-src/';
 var board = null;
 var canvas = null;
 var ctx = null;
@@ -32,8 +32,9 @@ var App = function(){
     };
     
     this.boardState = 0;
+    this.loading = 0;
     this.knightIsMobile = 1;
-    this.moveList = [[2, 3],[4, 2]];
+    this.moveList = [];
     this.obstacles = {'1':1, '3':1, '5':1, '8':1};
     this.currentAction = this.addMoveToList;
     
@@ -56,7 +57,11 @@ var App = function(){
             self.main();
             $(canvas).on('click', function(){
                 var mousePos = getMousePos(canvas);
-                if(mousePos.x > 0 && mousePos.x < self.width && mousePos.y > 0 && mousePos.y < self.height){
+                if(
+                   mousePos.x > 0 && mousePos.x < self.width &&
+                   mousePos.y > 0 && mousePos.y < self.height &&
+                   self.boardState === 0
+                ){
                     var pos = self.getCellCoords(mousePos.x, mousePos.y);
                     self.currentAction(pos.c_x, pos.c_y);
                 }
@@ -68,11 +73,67 @@ var App = function(){
         this.moveList.push([c_x, c_y]);
     };
     
-    this.pathFind = function(){
-      // get startingPoint, destination and obstacles
-      // in a data object
-      
-      // Send ajax request  
+    this.addMoveSetToList = function(list){
+        this.moveList = this.moveList.concat(list);
+    };
+    
+    this.pathFind = function(c_x, c_y){
+        var self = this;
+        
+        var data = {
+            startingPoint: [this.knightPos.c_x, this.knightPos.c_y],
+            destination: [c_x, c_y],
+            obstacles: this.getChangedObstaclesFormat(),
+            _token: token,
+        };
+
+        $.ajax({
+            method: 'POST',
+            data: data,
+            url: knigthPathFindUrl,
+            beforeSend: function(){
+                self.loading = 1;
+                $('.canvas-overlay').removeClass('not-displayed');
+            },
+        }).done(function(res){
+            $('.canvas-overlay').addClass('not-displayed');
+            
+            if(res.status == 'OK'){
+                self.addMoveSetToList(res.solution);
+                self.loading = 0;
+            }
+        });
+        // Send ajax request  
+    };
+    
+    this.checkBoardState = function()
+    {
+        
+        if(
+           this.moveList.length > 0 ||
+           this.loading === 1
+        ){
+            this.boardState = 1;
+        } else {
+            this.boardState = 0;
+        }
+    };
+    
+    this.getChangedObstaclesFormat = function()
+    {
+        self = this;
+        var newFormat = {};
+        
+        $.each(this.obstacles, function(i){
+            var pos = self.getCellsByIdx(i);
+
+            if(typeof newFormat[pos.c_x] == 'undefined'){
+                newFormat[pos.c_x] = {};
+            }
+            newFormat[pos.c_x][pos.c_y] = true;
+        });
+
+        return newFormat;
     };
     
     this.hoverOverCell = function(){
@@ -338,14 +399,17 @@ var App = function(){
         var mainId = function(){
             self.drawBoard();
             self.drawObstacles();
-            self.currentAction = self.addMoveToList;
-
+                        
+            self.currentAction = self.pathFind;
             self.hoverOverCell();
             
             if(self.knightIsMobile === 1){
                 self.moveKnightTo();
             }
             self.drawKnightBase();
+            
+            self.checkBoardState();
+            
             requestAnimationFrame(mainId);
         };
         
