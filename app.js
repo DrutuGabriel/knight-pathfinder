@@ -8,6 +8,7 @@ $(document).ready(function(){
     board.init();
 });
 
+var relativeBaseUrl = '';
 var board = null;
 var canvas = null;
 var ctx = null;
@@ -65,6 +66,13 @@ var App = function(){
     
     this.addMoveToList = function (c_x, c_y) {
         this.moveList.push([c_x, c_y]);
+    };
+    
+    this.pathFind = function(){
+      // get startingPoint, destination and obstacles
+      // in a data object
+      
+      // Send ajax request  
     };
     
     this.hoverOverCell = function(){
@@ -188,12 +196,12 @@ var App = function(){
     
     this.loadKnightSprite = function(){
         this.knight = new Image();
-        this.knight.src = 'images/knight.png';
+        this.knight.src = relativeBaseUrl + 'images/knight.png';
     };
     
     this.loadImages = function(){
         this.images.blackX = new Image();
-        this.images.blackX.src =  'images/x-black.png';
+        this.images.blackX.src = relativeBaseUrl + 'images/x-black.png';
     };
     
     this.drawKnightToCell = function(c_x, c_y){
