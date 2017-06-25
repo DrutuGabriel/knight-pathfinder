@@ -5,7 +5,12 @@ $(document).mousemove(function(e) {
 
 $(document).ready(function(){
     board = new App();
-    board.init();
+    if($(window).width() <= 640){
+        board.init(36);        
+    } else {
+        board.init();
+    }
+   
 });
 
 var relativeBaseUrl = '/knight-path-finder-src/';
@@ -18,8 +23,7 @@ var App = function(){
     this.c_h = 50;
     this.cells_x = 8;
     this.cells_y = 8;
-    this.width = this.c_w * this.cells_x;
-    this.height = this.c_h * this.cells_y;
+
     this.knight = null;
     this.images = {
         blackX : null,    
@@ -38,7 +42,17 @@ var App = function(){
     this.obstacles = {'1':1, '3':1, '5':1, '8':1};
     this.currentAction = this.addMoveToList;
     
-    this.init = function(){
+    this.init = function(c_wh){
+        /* Set up canvas dimensions */
+        if(typeof c_wh == 'undefined'){
+            c_wh = 50;
+        }
+        this.c_w = c_wh;
+        this.c_h = c_wh;
+        
+        this.width = this.c_w * this.cells_x;
+        this.height = this.c_h * this.cells_y;
+        
         var self = this;
         
         canvas = document.getElementById('canvas-board');
@@ -51,6 +65,7 @@ var App = function(){
             height: canvas.height,
         });
         
+        /* Loading images and starting the loop */
         this.loadKnightSprite();
         this.loadImages();
         this.knight.onload = function(){
@@ -270,7 +285,7 @@ var App = function(){
     };
     
     this.drawKnight = function(x, y){
-        ctx.drawImage(this.knight, x + 10, y + 10, this.c_w - 20, this.c_h - 20);
+        ctx.drawImage(this.knight, x + 5, y + 5, this.c_w - 10, this.c_h - 10);
     };
     
     this.moveKnightTo = function(){
