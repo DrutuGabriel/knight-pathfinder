@@ -103,7 +103,6 @@ var App = function(){
                 self.loading = 0;
             }
         });
-        // Send ajax request  
     };
     
     this.checkBoardState = function()
@@ -343,9 +342,7 @@ var App = function(){
     
         for(var i = 0; i < obstaclesLen; i++){
             
-            var cells = this.getCellsByIdx(obstacles[i]);
-            //console.log(cells);
-            
+            var cells = this.getCellsByIdx(obstacles[i]);            
             var pos = this.getCellPosition(cells.c_x, cells.c_y);
             this.drawObstacle(pos.x, pos.y);
         }
@@ -370,11 +367,7 @@ var App = function(){
         delete this.obstacles[idx];
         
     };
-    
-    // Hover on obstacle function
-    // Cum gandesti coordonatele ca sa recunoasca hoverul pe text 'Remove Obstacle'
-    // Si apoi sa elimine obstacolul de la idx/pozitia respectiva
-    
+        
     this.drawBoard  =  function(){
         canvas.width = canvas.width;
         ctx.strokeStyle = '#000';
@@ -422,7 +415,7 @@ function getMousePos(canvas) {
     
     return {
       x: window.mousePosX - rect.left,
-      y: window.mousePosY - rect.top,
+      y: window.mousePosY - rect.top  - $(document).scrollTop(),
     };
 }
 
