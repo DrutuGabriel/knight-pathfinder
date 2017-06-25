@@ -5,20 +5,27 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title>Knight path finder</title>
 		<meta name="description" content="Knight path finder" />
-        <style>
-            #canvas-board {
-                border: 1px solid #000;
-            }
-        </style>
-        <script
-			  src="https://code.jquery.com/jquery-1.12.4.min.js"
-			  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
-			  crossorigin="anonymous"></script>
-        <script src="app.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
         <div class="app-container">
-            <canvas id="canvas-board"></canvas>
+            <div class="canvas-container">
+                <canvas id="canvas-board" width="400" height="400"></canvas>
+                <div class="not-displayed canvas-overlay">
+                    <img class="loading-gif" src="images/loading.gif" alt="loading" />
+                </div>
+            </div>
+            <div class="control-panel">
+                <button class="btn btn-default form-control clear-obstacles-act board-disable" type="button">Clear obstacles</button>
+                <button class="btn btn-default form-control random-obstacles-act board-disable" type="button">Random obstacles</button>
+            </div>
         </div>
+        <script
+            src="https://code.jquery.com/jquery-1.12.4.min.js"
+            integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+            crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="app.js"></script>
 	</body>
 </html>

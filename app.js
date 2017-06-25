@@ -13,7 +13,9 @@ $(document).ready(function(){
    
 });
 
-var relativeBaseUrl = '/knight-path-finder-src/';
+var knigthPathFindUrl, token;
+var relativeBaseUrl = '';
+
 var board = null;
 var canvas = null;
 var ctx = null;
@@ -70,6 +72,7 @@ var App = function(){
         this.loadKnightSprite();
         this.loadImages();
         this.knight.onload = function(){
+            self.setRandomObstacles();
             self.main();
             $(canvas).on('click', function(){
                 var mousePos = getMousePos(canvas);
@@ -121,10 +124,11 @@ var App = function(){
         }).done(function(res){
             $('.canvas-overlay').addClass('not-displayed');
             
-            if(res.status == 'OK'){
+            if(res.status == 'OK' && res.solution.length > 0){
                 self.addMoveSetToList(res.solution);
-                self.loading = 0;
             }
+            
+            self.loading = 0;
         });
     };
     

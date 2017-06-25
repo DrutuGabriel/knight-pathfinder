@@ -1,0 +1,56 @@
+#canvas-board {
+    border: 1px solid #000;
+    box-sizing: content-box;
+    background: #fff;
+}
+
+.app-container {
+  text-align: center;
+  margin: 0 auto;
+  max-width: 800px;
+}
+.canvas-container {
+  display: inline-block;
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.canvas-overlay {
+  background: rgba(0, 25, 25, 0.05) none repeat scroll 0 0;
+  display: block;
+  height: 100%;
+  max-height: 403px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  vertical-align: middle;
+  width: 100%;
+}
+
+.canvas-overlay:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.canvas-overlay .loading-gif {
+    max-width: 80px;
+    height: auto;
+}
+
+
+.control-panel {
+  display: inline-block;
+  margin: 0 0 15px 15px;
+  max-width: 400px;
+  vertical-align: top;
+}
+
+.control-panel > button {
+    margin-bottom: 5px;
+}
+
+.not-displayed {
+ display: none;    
+}
