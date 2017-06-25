@@ -1,26 +1,28 @@
 $(document).mousemove(function(e) {
     window.mousePosX= e.pageX;
     window.mousePosY = e.pageY;
+    window.mouseTarget = e.target;
 });
 
 $(document).ready(function(){
     board = new App();
     if($(window).width() <= 640){
-        board.init(36);        
+        board.setOnMobile(true);
+        board.init(36);
     } else {
         board.init();
     }
    
 });
 
-var knigthPathFindUrl, token;
+var token, knigthPathFindUrl;
 var relativeBaseUrl = '';
-
 var board = null;
 var canvas = null;
 var ctx = null;
 
 var App = function(){
+    this.onMobile = false;
     this.c_w = 50;
     this.c_h = 50;
     this.cells_x = 8;
@@ -82,6 +84,9 @@ var App = function(){
                    self.boardState === 0
                 ){
                     var pos = self.getCellCoords(mousePos.x, mousePos.y);
+                    if(self.onMobile){
+                        self.hoverOverCell();
+                    }
                     self.currentAction(pos.c_x, pos.c_y);
                 }
             });
@@ -93,6 +98,15 @@ var App = function(){
                 self.setRandomObstacles();
             });
         };
+    };
+    
+    this.setOnMobile = function(bool)
+    {
+        if(bool === true){
+            this.onMobile = true;
+        } else {
+            this.onMobile = false;
+        }
     };
     
     this.addMoveToList = function (c_x, c_y) {
@@ -124,8 +138,11 @@ var App = function(){
         }).done(function(res){
             $('.canvas-overlay').addClass('not-displayed');
             
-            if(res.status == 'OK' && res.solution.length > 0){
+            if(res.status == 'OK'){
                 self.addMoveSetToList(res.solution);
+                if(res.solution.length === 0){
+                    activateCustomAlert();
+                }
             }
             
             self.loading = 0;
@@ -154,6 +171,10 @@ var App = function(){
     };
         
     this.hoverOverCell = function(){
+        if(typeof window.mouseTarget == 'undefined' || window.mouseTarget.getAttribute('id') != 'canvas-board'){
+            return;
+        }
+        
         var mousePos = getMousePos(canvas);
        
         var pos = self.getCellCoords(mousePos.x, mousePos.y);
@@ -485,4 +506,3 @@ function getMousePos(canvas) {
       y: window.mousePosY - rect.top  - $(document).scrollTop(),
     };
 }
-

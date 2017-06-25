@@ -51,6 +51,22 @@
     margin-bottom: 5px;
 }
 
+.custom-alert-container {
+  display: none;
+  left: 0;
+  opacity: 0.95;
+  position: fixed;
+  right: 0;
+  text-align: center;
+  top: 0;
+  z-index: 9;
+}
+
+.custom-alert-container .custom-alert {
+  padding: 15px 0;
+}
+
 .not-displayed {
  display: none;    
 }
+
