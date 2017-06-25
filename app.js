@@ -37,6 +37,7 @@ var App = function(){
     
     this.boardState = 0;
     this.loading = 0;
+    this.triggered = 0;
     this.knightIsMobile = 1;
     this.moveList = [];
     this.obstacles = {'1':1, '3':1, '5':1, '8':1};
@@ -80,6 +81,13 @@ var App = function(){
                     var pos = self.getCellCoords(mousePos.x, mousePos.y);
                     self.currentAction(pos.c_x, pos.c_y);
                 }
+            });
+            
+            $(document).on('click', '.clear-obstacles-act', function(){
+                self.clearObstacles();
+            });
+            $(document).on('click', '.random-obstacles-act', function(){
+                self.setRandomObstacles();
             });
         };
     };
@@ -128,28 +136,19 @@ var App = function(){
            this.loading === 1
         ){
             this.boardState = 1;
+            if(this.triggered === 0){
+                $('.board-disable').attr('disabled', 'disabled');
+                self.triggered = 1;
+            }
         } else {
             this.boardState = 0;
+            if(this.triggered === 1){
+                $('.board-disable').removeAttr('disabled', 'disabled');
+                this.triggered = 0;
+            }
         }
     };
-    
-    this.getChangedObstaclesFormat = function()
-    {
-        self = this;
-        var newFormat = {};
         
-        $.each(this.obstacles, function(i){
-            var pos = self.getCellsByIdx(i);
-
-            if(typeof newFormat[pos.c_x] == 'undefined'){
-                newFormat[pos.c_x] = {};
-            }
-            newFormat[pos.c_x][pos.c_y] = true;
-        });
-
-        return newFormat;
-    };
-    
     this.hoverOverCell = function(){
         var mousePos = getMousePos(canvas);
        
@@ -365,7 +364,6 @@ var App = function(){
     
     /**
      * Add an obstacle
-     *
      */
     this.addObstacle = function(c_x, c_y){
         var idx = this.getIdxByCells(c_x, c_y);
@@ -374,7 +372,6 @@ var App = function(){
     
     /**
      * Delete the obstacle entry
-     *
      */
     this.removeObstacle = function(c_x, c_y){
         var idx = this.getIdxByCells(c_x, c_y);
@@ -382,7 +379,58 @@ var App = function(){
         delete this.obstacles[idx];
         
     };
+    
+    /**
+     * Remove all obstacles
+     */
+    this.clearObstacles = function()
+    {
+        this.obstacles = {};
+    };
+    
+    /**
+     * Set random obstacles
+     */
+    this.setRandomObstacles = function()
+    {
+        // get starting position idx to exclude it
+        var sPosIdx = this.getIdxByCells(this.knightPos.c_x, this.knightPos.c_y);
+        var cellCount =  this.cells_x * this.cells_y;
         
+        this.clearObstacles();
+        for(var i = 0, probability, randomResult; i < cellCount; i++ ){
+            if(sPosIdx == i){
+                continue;
+            }
+            
+            probability = Math.floor(Math.random()*8) + 1;
+            randomResult = Math.floor(Math.random()*10) + 1;
+            if(randomResult <= probability){
+                // set obstacle;
+                this.obstacles[i] = 1;
+            }
+        }
+        
+    };
+    
+    this.getChangedObstaclesFormat = function()
+    {
+        self = this;
+        var newFormat = {};
+        
+        $.each(this.obstacles, function(i){
+            var pos = self.getCellsByIdx(i);
+
+            if(typeof newFormat[pos.c_x] == 'undefined'){
+                newFormat[pos.c_x] = {};
+            }
+            newFormat[pos.c_x][pos.c_y] = true;
+        });
+
+        return newFormat;
+    };
+
+   
     this.drawBoard  =  function(){
         canvas.width = canvas.width;
         ctx.strokeStyle = '#000';
